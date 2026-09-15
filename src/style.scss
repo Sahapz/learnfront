@@ -1,9 +1,3 @@
-@use "sass:color";
-$bgcolor: gray;
-body {
-  background: color.scale($bgcolor, $lightness: -80%); 
-}
-
-h1 {
-  color: #fff;
-}
+@use "bulma/sass" with (
+  $primary: indigo,
+);
