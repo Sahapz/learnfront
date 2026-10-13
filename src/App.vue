@@ -1,38 +1,56 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import ItemList from './ItemList.vue';
 
-let message = ref('Hello vue!');
+let message = ref('');
+let i = 1;
+let items = ref([
+    {id: i++, text: 'Piim', isDone: false, importance: 'high'},
+    {id: i++, text: 'Viin', isDone: true, importance: 'low'},
+    {id: i++, text: 'Õlu', isDone: false, importance: 'medium'},
+    {id: i++, text: 'Sai', isDone: true, importance: 'high'},
+]);
 
-let items = ref(['Item 1', 'Item 2', 'Item 3']);
- function add() {
+function add(){
+  if(message.value.trim() !== '') {
+        items.value.push({id: i++, text: message.value.trim(), isDone: false, importance: 'medium'});
+  }
+  message.value = '';
+}
 
-    if (message.value.trim() === '') {
-        return;
-    }
-    items.value.push(message.value.trim());
-    message.value = '';
-   }    
+function removeItem(itemId) {
+        items.value = items.value.filter(item => item.id !== itemId);
+}
+
+const importanceRank = {high: 3, medium: 2, low: 1};
+function sortByImportance(itemList) {
+    return [...itemList].sort((first, second) =>
+        importanceRank[second.importance] - importanceRank[first.importance]
+    );
+}
+
+let allItems = computed(() => sortByImportance(items.value));
+let doneItems = computed(() => sortByImportance(items.value.filter(item => item.isDone)));
+let toDoItems = computed(() => sortByImportance(items.value.filter(item => !item.isDone)));
 </script>
-
 
 <template>
     <div class="container content mt-2">
-
-
-        <!--input v-bind:value="message" v-on:input="message = $event.target.value" class="input" type="text" placeholder="Sisesta sõnum"-->
         <div class="field has-addons">
             <div class="control is-expanded">
-                <input @keyup.enter="add" type="text" v-model="message" class="input" placeholder="Add item">
+                <input @keydown.enter="add" v-model="message" class="input" type="text" placeholder="Add item">
             </div>
             <div class="control">
-                <button @click="add" class="button is-info">Add</button>
+                <button @click="add" class="button is-info">
+                    Add
+                </button>
             </div>
         </div>
-        <ul>
-            <li v-for="item in items" :key="item">{{ item }}</li>
-        </ul>
+
+        <ItemList :items="allItems" title="All items" @delete="removeItem"></ItemList>
+        <ItemList :items="doneItems" title="Done items" @delete="removeItem"></ItemList>
+        <ItemList :items="toDoItems" title="ToDo items" @delete="removeItem"></ItemList>
     </div>
 </template>
-
 
 <style></style>
