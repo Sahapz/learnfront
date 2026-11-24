@@ -1,5 +1,20 @@
 <script setup>
-defineProps(['items', 'title']);
+defineProps({
+    items: {
+        type: Array,
+        required: true,
+        validator: (items) => items.every((item) =>
+            typeof item.id === 'number'
+            && typeof item.text === 'string'
+            && typeof item.isDone === 'boolean'
+            && ['high', 'medium', 'low'].includes(item.importance)
+        ),
+    },
+    title: {
+        type: String,
+        required: true,
+    },
+});
 const emit = defineEmits(['delete']);
 
 const importanceOptions = [
